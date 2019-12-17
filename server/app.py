@@ -41,7 +41,7 @@ def genHTML(request):
         return json.dumps(response), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, {'Content-Type':'application/json'}
 
     #render the markdown text into html text
-    html = markdown.markdown(md, extensions=['mdx_truly_sane_lists', 'fenced_code'])
+    html = markdown.markdown(md, extensions=['mdx_truly_sane_lists', 'pymdownx.superfences'])
 
     response["id"] = genID()
 
