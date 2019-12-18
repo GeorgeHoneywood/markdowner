@@ -1,0 +1,44 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+.content .row.header {
+    height: 25px;
+    background: grey;
+}
+
+.content .row.data {
+    height: calc(20% - (25px)); 
+    min-height: calc(20% - (25px));
+    /* Adding 100px of header and 150px of footer */
+
+    background: tomato;
+}
+
+/* .content { flexboxes are hot trash
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.content .row {
+  border: 1px dotted black;
+}
+
+.content .row.header {
+  flex: 0 1 auto;
+}
+
+.content .row.title {
+  flex: 0 1 auto;
+}
+
+.content .row.data {
+  flex: 1 1 auto;
+}
+
+.box .row.footer {
+    flex: 0 1 40px;
+} */

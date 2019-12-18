@@ -1,13 +1,11 @@
-<!doctype html>
-<html>
-   <body>
-      <form action = "{{ url }}" method = "POST">
-        <!-- <p>test <input type = "text" name = "tests" /></p> -->
-        <!-- <p><input type = "submit" value = "submit" /></p> -->
-        <p>
-            <TEXTAREA name="data" rows="50" cols="120"></TEXTAREA>
-            <INPUT type="submit" value="Send"><INPUT type="reset">
-        </p>
-      </form>
-   </body>
-</html>
+{% extends "header.html" %}
+
+{% block content %}
+    <div class="row title"><h1>upload</h1></div>
+    <div class="row data">
+        <form action = "{{ url }}" method = "POST">
+            <textarea name="data" rows="10" cols="12"></textarea>
+            <input type="submit" value="Send"><input type="reset">
+        </form>
+    </div>
+{% endblock %}

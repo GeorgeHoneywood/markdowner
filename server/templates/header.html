@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-      <!-- <link id="favicon" rel="shortcut icon" type="image/png" href="data:image/png;base64,....=="> -->
-      <link rel="icon" href="data:;base64,=">
+      <!-- <link rel="icon" href="data:;base64,="> -->
+      <link rel="stylesheet" href="{{url_for( 'static', filename = 'style.css')}}">
+
       {% if title %}
       <title>markdowner: {{ title }}</title>
       {% else %}
@@ -10,8 +11,10 @@
       {% endif %}
     </head>
     <body>
-        <div>markdowner: <a href="{{ url_for('index') }}">root</a> | <a href="{{ url_for('upload') }}">upload</a> {% if display %} | <a href="{{url_for('rawFetch', id = id)}}">raw</a>{% endif %} </div>
-        <hr>
-        {% block content %}{% endblock %}
+        <div class="content">
+          <div class="row header">markdowner: <a href="{{ url_for('index') }}">root</a> | <a href="{{ url_for('upload') }}">upload</a> {% if display %} | <a href="{{url_for('rawFetch', id = id)}}">raw</a>{% endif %} <hr></div>
+          {% block content %}{% endblock %}
+          <div class="row footer"></div>
+        </div>
     </body>
 </html>
