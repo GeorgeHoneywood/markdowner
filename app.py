@@ -2,22 +2,23 @@ from flask import Flask, request, url_for, render_template, redirect, abort, esc
 from flask_cors import CORS
 from flask_api import status
 
+from pymongo import MongoClient
+from datetime import datetime
 from random import choice
 
 import json
 import requests
 import string
 import markdown
-import os
 
 app = Flask(__name__)
 CORS(app)
 
 response = {}
-prefix = "html/"
 
-if not os.path.exists(prefix):
-    os.makedirs(prefix)
+client = MongoClient("mongodb://markdowner:FC9BAuUt32wX@ds117960.mlab.com:17960/heroku_n4snplp7")
+db = client["heroku_n4snplp7"]
+pastes = db.pastes
 
 @app.route("/", methods=["GET"])
 def index():
@@ -51,17 +52,22 @@ def genHTML(request):
     #render the markdown text into html text
     html = markdown.markdown(escape(md), extensions=['mdx_truly_sane_lists', 'pymdownx.superfences'])
 
-    response["id"] = genID()
+    paste = { 
+            "pasteID": genID(),
+            "userID": "000000",
+            "timestamp": datetime.now(),
+            "markdown": md,
+            "html": html
+        }
 
-    with open(prefix + response["id"], "w") as f:
-        f.write(html)
+    pastes.insert_one(paste)
 
     if request.content_type == 'application/x-www-form-urlencoded':
         return redirect(url_for('fetch', id = response["id"]))
     else:
         response["code"] = status.HTTP_201_CREATED
-        response["status"] = "Created file, everything worked, visit {} to access your data".format(url_for('fetch', id = response["id"]))
-        response["url"] = url_for('fetch', id = response["id"])
+        response["status"] = "Created file, everything worked, visit {} to access your data".format(url_for('fetch', id = paste["pasteID"]))
+        response["url"] = url_for('fetch', id = paste["pasteID"])
 
         return json.dumps(response), status.HTTP_201_CREATED, {'Content-Type':'application/json'}
 
@@ -71,25 +77,31 @@ def genID():
 def inputMarkdown(request):
     return render_template("upload.html", url=url_for("upload", _external=True))
 
-@app.route("/fetch/<string:id>/raw", methods=['GET'])
-def rawFetch(id):
-    return retrieve(id), status.HTTP_200_OK, {'Content-Type':'text/html'}
+@app.route("/fetch/<string:pasteID>/raw", methods=['GET'])
+def rawFetch(pasteID):
+    return retrieve(pasteID)["html"], status.HTTP_200_OK, {'Content-Type':'text/html'}
 
-@app.route("/fetch/<string:id>", methods=['GET'])
-def fetch(id):
-    body = retrieve(id)
+@app.route("/fetch/<string:pasteID>", methods=['GET'])
+def fetch(pasteID):
+    paste = retrieve(pasteID)
 
-    return render_template("display.html", body = body, title = "fetch", display = True, id = id)
+    return render_template("display.html", body = paste["html"], title = "fetch", display = True, id = pasteID)
 
-def retrieve(id):
-    try:
-        with open(prefix + id, "r") as f:
-            return f.read()
-    except FileNotFoundError as e:
-        # response["code"] = status.HTTP_404_NOT_FOUND
-        # response["status"] = "ID '{}' not found".format(id)
-        # return json.dumps(response), status.HTTP_404_NOT_FOUND, {'Content-Type':'application/json'}
+def retrieve(pasteID):
+    # try:
+    #     with open(prefix + id, "r") as f:
+    #         return f.read()
+    # except FileNotFoundError as e:
+    #     # response["code"] = status.HTTP_404_NOT_FOUND
+    #     # response["status"] = "ID '{}' not found".format(id)
+    #     # return json.dumps(response), status.HTTP_404_NOT_FOUND, {'Content-Type':'application/json'}
+    #     abort(404)
+    paste = pastes.find_one({"pasteID": pasteID})
+
+    if not paste:
         abort(404)
+    else:
+        return paste
 
 if __name__ == "__main__":
     app.run(debug=True, host = "0.0.0.0")
