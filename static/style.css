@@ -44,8 +44,9 @@ body {
     flex: 0 1 40px;
 } */
 
-#left { *display:inline-block;width:40%; vertical-align:top;float:left; }
-#right { *display:inline-block;width:60%; vertical-align:top;float:right; text-align: end;}
+#left { width:40%; float:left; }
+#right { width:60%; float:right; text-align: end; }
+#below { width:100%; float: right; }
 
 textarea {
   background-color: #222;

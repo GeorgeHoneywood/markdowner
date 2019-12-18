@@ -13,7 +13,7 @@
     <body>
         <div class="content">
           <div class="row header"><div id="left">markdowner: <a href="{{ url_for('index') }}">root</a> | <a href="{{ url_for('upload') }}">upload</a> {% if fetch %} | <a href="{{url_for('rawFetch', pasteID = pasteID)}}">raw</a>{% endif %}</div><div id="right"> {% if fetch %}by: {{ user }} | uploaded at: {{ timestamp.strftime("%d/%m/%Y %H:%M:%S") }}{% else %}<a>login</a>{% endif %}</div> 
-          </div><hr>
+          <div id="below"><hr></div></div>
           {% block content %}{% endblock %}
           <div class="row footer"></div>
         </div>
