@@ -1,0 +1,7 @@
+requests==2.22.0
+Flask_API==1.1
+Flask==1.1.1
+Markdown==3.1.1
+Flask_Cors==3.0.8
+Pygments==2.3.1
+mdx-truly-sane-lists==1.2
