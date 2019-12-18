@@ -8,12 +8,16 @@ import json
 import requests
 import string
 import markdown
+import os
 
 app = Flask(__name__)
 CORS(app)
 
 response = {}
 prefix = "html/"
+
+if not os.path.exists(prefix):
+    os.makedirs(prefix)
 
 @app.route("/", methods=["GET"])
 def index():
