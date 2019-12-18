@@ -54,7 +54,7 @@ def genHTML(request):
 
     paste = { 
             "pasteID": genID(),
-            "userID": "000000",
+            "userID": "0000000000000000000",
             "timestamp": datetime.now(),
             "markdown": md,
             "html": html
@@ -63,11 +63,11 @@ def genHTML(request):
     pastes.insert_one(paste)
 
     if request.content_type == 'application/x-www-form-urlencoded':
-        return redirect(url_for('fetch', id = response["id"]))
+        return redirect(url_for('fetch', pasteID = paste["pasteID"]))
     else:
         response["code"] = status.HTTP_201_CREATED
-        response["status"] = "Created file, everything worked, visit {} to access your data".format(url_for('fetch', id = paste["pasteID"]))
-        response["url"] = url_for('fetch', id = paste["pasteID"])
+        response["status"] = "Created file, everything worked, visit {} to access your data".format(url_for('fetch', pasteID = paste["pasteID"]))
+        response["url"] = url_for('fetch', pasteID = paste["pasteID"])
 
         return json.dumps(response), status.HTTP_201_CREATED, {'Content-Type':'application/json'}
 
@@ -85,17 +85,9 @@ def rawFetch(pasteID):
 def fetch(pasteID):
     paste = retrieve(pasteID)
 
-    return render_template("display.html", body = paste["html"], title = "fetch", display = True, id = pasteID)
+    return render_template("display.html", body = paste["html"], title = "fetch", fetch = True, pasteID = pasteID, user = paste["userID"], timestamp = paste["timestamp"])
 
 def retrieve(pasteID):
-    # try:
-    #     with open(prefix + id, "r") as f:
-    #         return f.read()
-    # except FileNotFoundError as e:
-    #     # response["code"] = status.HTTP_404_NOT_FOUND
-    #     # response["status"] = "ID '{}' not found".format(id)
-    #     # return json.dumps(response), status.HTTP_404_NOT_FOUND, {'Content-Type':'application/json'}
-    #     abort(404)
     paste = pastes.find_one({"pasteID": pasteID})
 
     if not paste:
