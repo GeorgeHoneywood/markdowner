@@ -15,6 +15,10 @@ CORS(app)
 response = {}
 prefix = "html/"
 
+@app.route("/", methods=["GET"])
+def index():
+    return render_template("index.html", upload=url_for("upload"))
+
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     if request.method == "POST":
@@ -63,16 +67,25 @@ def genID():
 def inputMarkdown(request):
     return render_template("upload.html", url=url_for("upload", _external=True))
 
+@app.route("/fetch/<string:id>/raw", methods=['GET'])
+def rawFetch(id):
+    return retrieve(id), status.HTTP_200_OK, {'Content-Type':'text/html'}
+
 @app.route("/fetch/<string:id>", methods=['GET'])
+def fetch(id):
+    body = retrieve(id)
+
+    return render_template("display.html", body = body, title = "fetch", display = True, id = id)
+
 def retrieve(id):
     try:
         with open(prefix + id, "r") as f:
-            return f.read(), status.HTTP_200_OK, {'Content-Type':'text/html'}
+            return f.read()
     except FileNotFoundError as e:
-        response["code"] = status.HTTP_404_NOT_FOUND
-        response["status"] = "ID '{}' not found".format(id)
-        return json.dumps(response), status.HTTP_404_NOT_FOUND, {'Content-Type':'application/json'}
-        # abort(404)
+        # response["code"] = status.HTTP_404_NOT_FOUND
+        # response["status"] = "ID '{}' not found".format(id)
+        # return json.dumps(response), status.HTTP_404_NOT_FOUND, {'Content-Type':'application/json'}
+        abort(404)
 
 if __name__ == "__main__":
     app.run(debug=True)

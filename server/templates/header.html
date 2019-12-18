@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <!-- <link id="favicon" rel="shortcut icon" type="image/png" href="data:image/png;base64,....=="> -->
+      <link rel="icon" href="data:;base64,=">
+      {% if title %}
+      <title>markdowner: {{ title }}</title>
+      {% else %}
+      <title>markdowner</title>
+      {% endif %}
+    </head>
+    <body>
+        <div>markdowner: <a href="{{ url_for('index') }}">root</a> | <a href="{{ url_for('upload') }}">upload</a> {% if display %} | <a href="{{url_for('rawFetch', id = id)}}">raw</a>{% endif %} </div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>

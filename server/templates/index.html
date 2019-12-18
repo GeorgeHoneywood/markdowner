@@ -1,0 +1,21 @@
+{% extends "header.html" %}
+
+{% block content %}
+    <h1>markdowner</h1>
+    <p>a pastebin for markdown that renders it into html fragments.</p>
+
+    <h3>uploading</h3>
+    <ul>
+        <li>you can upload through the web interface, linked in the header</li>
+        <li>cURL can also be used, for example "<code>curl -H "Content-Type: text/markdown" -X POST --data-binary '@test-file.md' {{ url_for('upload', _external=True) }}</code>". it is is important to use "<code>--data-binary</code>", as otherwise newlines will be mangled.</li>
+    </ul>
+    <h3>downloading</h3>
+    <ul>
+        <li>if you wish to get the raw data without the header, you can access it at <a>{{ url_for('rawFetch', id = "fakeID",_external=True) }}</a></li>
+        <li>this is useful if you want to download the rendered HTML with cURL, as in "<code>curl {{ url_for('rawFetch', id = "fakeID",_external=True) }} > file.html</code>" </li>
+    </ul>
+    <h3>notes</h3>
+    <ul>
+        <li>this uses the "python-markdown" module to handle the rendering, so don't get annoyed at me when it doesn't work</li>
+    </ul>
+{% endblock %}
