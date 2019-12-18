@@ -44,6 +44,10 @@ body {
     flex: 0 1 40px;
 } */
 
+textarea {
+  background-color: #222;
+}
+
 pre,
 code {
   font-family: Menlo, Monaco, "Courier New", monospace;
