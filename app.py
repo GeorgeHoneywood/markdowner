@@ -60,8 +60,8 @@ def genHTML(request):
         return redirect(url_for('fetch', id = response["id"]))
     else:
         response["code"] = status.HTTP_201_CREATED
-        response["status"] = "Created file, everything worked, visit {}fetch/{} to access your data".format(request.host_url, response["id"])
-        response["url"] = "{}fetch/{}".format(request.host_url, response["id"])
+        response["status"] = "Created file, everything worked, visit {} to access your data".format(url_for('fetch', id = response["id"]))
+        response["url"] = url_for('fetch', id = response["id"])
 
         return json.dumps(response), status.HTTP_201_CREATED, {'Content-Type':'application/json'}
 
