@@ -54,7 +54,7 @@ def genHTML(request):
 
     paste = { 
             "pasteID": genID(),
-            "userID": "0000000000000000000",
+            "userID": "guest",
             "timestamp": datetime.now(),
             "markdown": md,
             "html": html
