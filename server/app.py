@@ -1,4 +1,4 @@
-from flask import Flask, request, url_for, render_template, redirect, abort
+from flask import Flask, request, url_for, render_template, redirect, abort, escape
 from flask_cors import CORS
 from flask_api import status
 
@@ -45,7 +45,7 @@ def genHTML(request):
         return json.dumps(response), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, {'Content-Type':'application/json'}
 
     #render the markdown text into html text
-    html = markdown.markdown(md, extensions=['mdx_truly_sane_lists', 'pymdownx.superfences'])
+    html = markdown.markdown(escape(md), extensions=['mdx_truly_sane_lists', 'pymdownx.superfences'])
 
     response["id"] = genID()
 
@@ -53,7 +53,7 @@ def genHTML(request):
         f.write(html)
 
     if request.content_type == 'application/x-www-form-urlencoded':
-        return redirect("{}fetch/{}".format(request.host_url, response["id"]))
+        return redirect(url_for('fetch', id = response["id"]))
     else:
         response["code"] = status.HTTP_201_CREATED
         response["status"] = "Created file, everything worked, visit {}fetch/{} to access your data".format(request.host_url, response["id"])
