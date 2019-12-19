@@ -50,6 +50,9 @@ def genHTML(request):
         response["status"] = "Markdown only please ('Content-Type: text/markdown', not '{}')".format(request.content_type)
         return json.dumps(response), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, {'Content-Type':'application/json'}
 
+    if len(md) > 50000:
+        abort(status.HTTP_406_NOT_ACCEPTABLE)
+
     #render the markdown text into html text
     html = markdown.markdown(escape(md), extensions=['mdx_truly_sane_lists', 'pymdownx.superfences'])
 
