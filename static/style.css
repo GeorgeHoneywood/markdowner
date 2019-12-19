@@ -44,6 +44,14 @@ body {
     flex: 0 1 40px;
 } */
 
+.error {
+  color: red;
+}
+
+.message {
+  color: green;
+}
+
 #left { width:40%; float:left; }
 #right { width:60%; float:right; text-align: end; }
 #below { width:100%; float: right; }

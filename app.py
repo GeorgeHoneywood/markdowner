@@ -1,6 +1,10 @@
-from flask import Flask, request, url_for, render_template, redirect, abort, escape
+from flask import Flask, session, request, url_for, render_template, redirect, abort, escape, flash
 from flask_cors import CORS
 from flask_api import status
+from flask_session import Session
+
+#from werkzeug.security import generate_password_hash, check_password_hash
+#from werkzeug.middleware.proxy_fix import ProxyFix
 
 from pymongo import MongoClient
 from datetime import datetime
@@ -13,24 +17,67 @@ import markdown
 import os
 
 app = Flask(__name__)
+app.app_context().push()
 CORS(app)
+
+#app.secret_key = os.environ["SECRET_KEY"].encode("utf-8")
+#app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 response = {}
 
 client = MongoClient(os.environ["MONGODB_URI"])
 db = client["heroku_n4snplp7"]
 pastes = db.pastes
+users = db.users
+
+# SESSION_TYPE = "mongodb"
+# SESSION_MONGODB = client
+# app.config.from_object(__name__)
+# Session(app)
 
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html", upload=url_for("upload"))
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html"), status.HTTP_200_OK
+    else:
+        user = users.find_one({"username": request.form['username']})
+        if not user:
+            error = "user doesn't exist"
+            return redirect(url_for("login", error = error))
+        else:
+            if check_password_hash(escape(request.form['password']).encode("utf-8") + user["salt"]):
+                print("yes")
+            else:
+                print("nop")
+
+@app.route("/signup", methods=["POST"])
+def signup():
+    if users.find_one({"username": request.form['username']}):
+        error = "user already exists"
+        return redirect(url_for("login", error = error))
+    else:
+        message = "user '{}' created".format(request.form['username'])
+        salt = os.urandom(16)
+
+        users.insert_one({ 
+                            "username": request.form['username'],
+                            "password": generate_password_hash(escape(request.form['password']).encode("utf-8") + salt),
+                            "salt": salt,
+                            "timestamp": datetime.now(),
+                            "ip": request.remote_addr
+                          })
+        return redirect(url_for("login", message = message))
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     if request.method == "POST":
         return genHTML(request)
     else:
-        return inputMarkdown(request)
+        return render_template("upload.html")
 
 def genHTML(request):
     if request.content_type == 'application/x-www-form-urlencoded':
@@ -41,14 +88,10 @@ def genHTML(request):
             md = request.data.decode("utf-8")
 
             md = md.replace("\\n", "\n")
-        except UnicodeDecodeError as e:
-            response["code"] = status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-            response["status"] = "Markdown only please ('{}')".format(e)
-            return json.dumps(response), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, {'Content-Type':'application/json'}
+        except UnicodeDecodeError:
+            return badInputError(request)
     else:
-        response["code"] = status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-        response["status"] = "Markdown only please ('Content-Type: text/markdown', not '{}')".format(request.content_type)
-        return json.dumps(response), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, {'Content-Type':'application/json'}
+        return badInputError(request)
 
     if len(md) > 50000:
         abort(status.HTTP_406_NOT_ACCEPTABLE)
@@ -57,12 +100,12 @@ def genHTML(request):
     html = markdown.markdown(escape(md), extensions=['mdx_truly_sane_lists', 'pymdownx.superfences'])
 
     paste = { 
-            "pasteID": genID(),
-            "userID": "guest",
-            "timestamp": datetime.now(),
-            "markdown": md,
-            "html": html
-        }
+                "pasteID": genID(),
+                "username": "guest",
+                "timestamp": datetime.now(),
+                "markdown": md,
+                "html": html
+            }
 
     pastes.insert_one(paste)
 
@@ -78,8 +121,10 @@ def genHTML(request):
 def genID():
     return "".join([choice(string.ascii_letters + string.digits) for char in range(8)])
 
-def inputMarkdown(request):
-    return render_template("upload.html", url=url_for("upload", _external=True))
+def badInputError(request):
+    response["code"] = status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+    response["status"] = "Markdown only please ('Content-Type: text/markdown', not '{}')".format(request.content_type)
+    return json.dumps(response), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, {'Content-Type':'application/json'}
 
 @app.route("/fetch/<string:pasteID>/raw", methods=['GET'])
 def rawFetch(pasteID):
@@ -89,7 +134,7 @@ def rawFetch(pasteID):
 def fetch(pasteID):
     paste = retrieve(pasteID)
 
-    return render_template("display.html", body = paste["html"], title = "fetch", fetch = True, pasteID = pasteID, user = paste["userID"], timestamp = paste["timestamp"])
+    return render_template("display.html", paste = paste, title = "fetch", fetch = True)
 
 def retrieve(pasteID):
     paste = pastes.find_one({"pasteID": pasteID})

@@ -3,7 +3,7 @@
 {% block content %}
     <div class="row title"><h1>upload</h1></div>
     <div class="row data">
-        <form action = "{{ url }}" method = "POST">
+        <form action = "{{ url_for('upload') }}" method = "POST">
             <textarea name="data" rows="60" cols="150" style="width: 1125px; height: 898px; resize: none;"></textarea>
             <input type="submit" value="Send"><input type="reset">
         </form>
