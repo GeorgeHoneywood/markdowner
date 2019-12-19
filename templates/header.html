@@ -2,13 +2,15 @@
 <html>
     <head>
       <!-- <link rel="icon" href="data:;base64,="> -->
-      <link rel="stylesheet" href="{{url_for( 'static', filename = 'style.css')}}">
+      <link rel="stylesheet" href="{{url_for('static', filename = 'style.css')}}">
 
       {% if title %}
       <title>markdowner: {{ title }}</title>
       {% else %}
       <title>markdowner</title>
       {% endif %}
+
+      <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.png') }}">
     </head>
     <body>
         <div class="content">
