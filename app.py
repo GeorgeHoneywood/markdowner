@@ -10,13 +10,14 @@ import json
 import requests
 import string
 import markdown
+import os
 
 app = Flask(__name__)
 CORS(app)
 
 response = {}
 
-client = MongoClient("mongodb://markdowner:FC9BAuUt32wX@ds117960.mlab.com:17960/heroku_n4snplp7")
+client = MongoClient(os.environ["MONGODB_URI"])
 db = client["heroku_n4snplp7"]
 pastes = db.pastes
 
