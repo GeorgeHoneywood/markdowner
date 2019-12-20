@@ -61,6 +61,20 @@ textarea {
   color: #FFF;
 }
 
+table, td, th {
+  border: 1px solid #fafafa;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding-left: 5px;
+  text-align: left;
+}
+
 pre,
 code {
   font-family: Menlo, Monaco, "Courier New", monospace;
