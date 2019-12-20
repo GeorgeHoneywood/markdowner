@@ -8,15 +8,21 @@
         <tr>
         <td class="c1">index</td>
         <td class="c2">creation time</td>
-        <td class="c3">link</td>
-        <td class="c4">size</td>
+        {% if user["username"] == "root" %}
+            <td class="c3">user</td>
+        {% endif %}
+        <td class="c4">link</td>
+        <td class="c5">size</td>
     </tr>
     {% for paste in user_pastes %}
     <tr>
         <td class="c1">{{ loop.index }}</td>
         <td class="c2">{{ paste["timestamp"].strftime("%d/%m/%Y %H:%M:%S") }}</td>
-        <td class="c3"><a href="{{ url_for('fetch', pasteID = paste['pasteID']) }}"> {{ paste['pasteID'] }}</a></td>
-        <td class="c4">this didn't work</td>
+        {% if user["username"] == "root" %}
+            <td class="c3">{{ paste["username"] }}</td>
+        {% endif %}
+        <td class="c4"><a href="{{ url_for('fetch', pasteID = paste['pasteID']) }}"> {{ paste['pasteID'] }}</a></td>
+        <td class="c5">this didn't work</td>
     </tr>
     {% endfor %}
     {% else %}

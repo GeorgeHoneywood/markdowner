@@ -154,7 +154,7 @@ def list_pastes():
 
         if user["username"] == "root":
             user_pastes = pastes.find({})
-            return render_template("list-pastes.html", user_pastes = user_pastes)
+            return render_template("list-pastes.html", user_pastes = user_pastes, user = user)
 
         else:
             user_pastes = pastes.find({"username": user["username"]})
@@ -167,15 +167,15 @@ def list_pastes():
     else:
         abort(status.HTTP_401_UNAUTHORIZED)
 
-@app.route("/fetch/<string:pasteID>.html", methods=['GET'])
+@app.route("/<string:pasteID>.html", methods=['GET'])
 def rawFetch(pasteID):
     return retrieve(pasteID)["html"], status.HTTP_200_OK, {'Content-Type':'text/html'}
 
-@app.route("/fetch/<string:pasteID>.md", methods=['GET'])
+@app.route("/<string:pasteID>.md", methods=['GET'])
 def sourceFetch(pasteID):
     return retrieve(pasteID)["markdown"], status.HTTP_200_OK, {'Content-Type':'text/markdown'}
 
-@app.route("/fetch/<string:pasteID>", methods=['GET'])
+@app.route("/<string:pasteID>", methods=['GET'])
 def fetch(pasteID):
     paste = retrieve(pasteID)
 
