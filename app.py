@@ -3,8 +3,8 @@ from flask_cors import CORS
 from flask_api import status
 from flask_session import Session
 
-#from werkzeug.security import generate_password_hash, check_password_hash
-#from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from pymongo import MongoClient
 from datetime import datetime
@@ -17,11 +17,11 @@ import markdown
 import os
 
 app = Flask(__name__)
-app.app_context().push()
+#app.app_context().push()
 CORS(app)
 
-#app.secret_key = os.environ["SECRET_KEY"].encode("utf-8")
-#app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+app.secret_key = os.environ["SECRET_KEY"].encode("utf-8")
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 response = {}
 
@@ -30,14 +30,24 @@ db = client["heroku_n4snplp7"]
 pastes = db.pastes
 users = db.users
 
-# SESSION_TYPE = "mongodb"
-# SESSION_MONGODB = client
-# app.config.from_object(__name__)
-# Session(app)
+SESSION_COOKIE_NAME="flask_sess"
+SESSION_TYPE = "mongodb"
+SESSION_MONGODB = client
+SESSION_MONGODB_DB = "heroku_n4snplp7"
+
+app.config.from_object(__name__)
+Session(app)
 
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html", upload=url_for("upload"))
+
+@app.route("/test")
+def test():
+    if session.get("authenticated"):
+        return "yes", 200
+    else:
+        return "no", 404
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -49,10 +59,19 @@ def login():
             error = "user doesn't exist"
             return redirect(url_for("login", error = error))
         else:
-            if check_password_hash(escape(request.form['password']).encode("utf-8") + user["salt"]):
-                print("yes")
+            if check_password_hash(user["password"], escape(request.form['password'])):
+                session["authenticated"] = True
+                session["user"] = user
+                return redirect(url_for("index"))
             else:
-                print("nop")
+                error = "authentication failed"
+                return redirect(url_for("login", error = error))
+
+@app.route("/logout", methods=["GET"])
+def logout():
+    session.pop("authenticated", None)
+    session.pop("user", None)
+    return redirect(url_for("index"))
 
 @app.route("/signup", methods=["POST"])
 def signup():
@@ -61,13 +80,11 @@ def signup():
         return redirect(url_for("login", error = error))
     else:
         message = "user '{}' created".format(request.form['username'])
-        salt = os.urandom(16)
 
         users.insert_one({ 
                             "username": request.form['username'],
-                            "password": generate_password_hash(escape(request.form['password']).encode("utf-8") + salt),
-                            "salt": salt,
-                            "timestamp": datetime.now(),
+                            "password": generate_password_hash(escape(request.form['password'])),
+                            "creation": datetime.now(),
                             "ip": request.remote_addr
                           })
         return redirect(url_for("login", message = message))
@@ -99,9 +116,13 @@ def genHTML(request):
     #render the markdown text into html text
     html = markdown.markdown(escape(md), extensions=['mdx_truly_sane_lists', 'pymdownx.superfences'])
 
+    #if user not logged in, store under their ip with a dodgy account
+    if not session.get("user"):
+        session["user"] = {"username": request.remote_addr}
+
     paste = { 
                 "pasteID": genID(),
-                "username": "guest",
+                "username": session.get("user")["username"],
                 "timestamp": datetime.now(),
                 "markdown": md,
                 "html": html
@@ -125,6 +146,26 @@ def badInputError(request):
     response["code"] = status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
     response["status"] = "Markdown only please ('Content-Type: text/markdown', not '{}')".format(request.content_type)
     return json.dumps(response), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, {'Content-Type':'application/json'}
+
+@app.route("/list", methods=['GET'])
+def list_pastes():
+    if session.get("authenticated"):
+        user = session.get("user")
+
+        if user["username"] == "root":
+            user_pastes = pastes.find({})
+            return render_template("list-pastes.html", user_pastes = user_pastes)
+
+        else:
+            user_pastes = pastes.find({"username": user["username"]})
+
+            if pastes.count_documents({"username": user["username"]}) != 0:
+                return render_template("list-pastes.html", user_pastes = user_pastes)
+            else:
+                return render_template("list-pastes.html", user_pastes = None)
+
+    else:
+        abort(status.HTTP_401_UNAUTHORIZED)
 
 @app.route("/fetch/<string:pasteID>/raw", methods=['GET'])
 def rawFetch(pasteID):

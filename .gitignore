@@ -117,4 +117,4 @@ dmypy.json
 html/
 .vscode/
 *.db
-db_test.py
+*_test.py

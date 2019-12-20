@@ -1,0 +1,25 @@
+{% extends "header.html" %}
+
+{% block content %}
+<div class="row title"><h1>your pastes</h1></div>
+<div class="row data">
+    {% if user_pastes %}
+    <table>
+        <tr>
+        <td class="c2">creation time</td>
+        <td class="c3">link</td>
+        <td class="c4">size</td>
+    </tr>
+    {% for paste in user_pastes %}
+    <tr>
+        <td class="c2">{{ paste["timestamp"].strftime("%d/%m/%Y %H:%M:%S") }}</td>
+        <td class="c3"><a href="{{ url_for('fetch', pasteID = paste['pasteID']) }}"> {{ paste['pasteID'] }}</a></td>
+        <td class="c4">this didn't work</td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <p>you don't have any pastes yet</p>
+    {% endif %}
+    </table>
+</div>
+{% endblock %}
