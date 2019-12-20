@@ -167,9 +167,13 @@ def list_pastes():
     else:
         abort(status.HTTP_401_UNAUTHORIZED)
 
-@app.route("/fetch/<string:pasteID>/raw", methods=['GET'])
+@app.route("/fetch/<string:pasteID>.html", methods=['GET'])
 def rawFetch(pasteID):
     return retrieve(pasteID)["html"], status.HTTP_200_OK, {'Content-Type':'text/html'}
+
+@app.route("/fetch/<string:pasteID>.md", methods=['GET'])
+def sourceFetch(pasteID):
+    return retrieve(pasteID)["markdown"], status.HTTP_200_OK, {'Content-Type':'text/markdown'}
 
 @app.route("/fetch/<string:pasteID>", methods=['GET'])
 def fetch(pasteID):
