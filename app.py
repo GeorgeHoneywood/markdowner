@@ -40,14 +40,7 @@ Session(app)
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html", upload=url_for("upload"))
-
-@app.route("/test")
-def test():
-    if session.get("authenticated"):
-        return "yes", 200
-    else:
-        return "no", 404
+    return render_template("index.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

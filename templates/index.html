@@ -13,7 +13,7 @@
         <h3>downloading</h3>
         <ul>
             <li>if you wish to get the raw data without the header, or without the dodgy CSS, you can access it at <a>{{ url_for('rawFetch', pasteID = "fakeID",_external=True) }}</a></li>
-            <li>this is useful if you want to download the rendered HTML with cURL, as in "<code>curl {{ url_for('rawFetch', pasteID = "fakeID",_external=True) }} > file.html</code>" </li>
+            <li>this is useful if you want to download the rendered HTML with cURL, as in "<code>curl <a>{{ url_for('rawFetch', pasteID = "fakeID",_external=True) }}</a> > file.html</code>" </li>
         </ul>
         <h3>notes</h3>
         <ul>
