@@ -9,6 +9,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from pymongo import MongoClient
 from datetime import datetime
 from random import choice
+from functools import wraps
 
 import json
 import requests
@@ -37,6 +38,16 @@ SESSION_MONGODB_DB = "heroku_n4snplp7"
 
 app.config.from_object(__name__)
 Session(app)
+
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if session.get("authenticated"):
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('login', error = "Login required"))
+
+    return wrap
 
 @app.route("/", methods=["GET"])
 def index():
@@ -141,24 +152,21 @@ def badInputError(request):
     return json.dumps(response), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, {'Content-Type':'application/json'}
 
 @app.route("/list", methods=['GET'])
+@login_required
 def list_pastes():
-    if session.get("authenticated"):
-        user = session.get("user")
+    user = session.get("user")
 
-        if user["username"] == "root":
-            user_pastes = pastes.find({})
-            return render_template("list-pastes.html", user_pastes = user_pastes, user = user)
-
-        else:
-            user_pastes = pastes.find({"username": user["username"]})
-
-            if pastes.count_documents({"username": user["username"]}) != 0:
-                return render_template("list-pastes.html", user_pastes = user_pastes)
-            else:
-                return render_template("list-pastes.html", user_pastes = None)
+    if user["username"] == "root":
+        user_pastes = pastes.find({})
+        return render_template("list-pastes.html", user_pastes = user_pastes, user = user)
 
     else:
-        abort(status.HTTP_401_UNAUTHORIZED)
+        user_pastes = pastes.find({"username": user["username"]})
+
+        if pastes.count_documents({"username": user["username"]}) != 0:
+            return render_template("list-pastes.html", user_pastes = user_pastes)
+        else:
+            return render_template("list-pastes.html", user_pastes = None)
 
 @app.route("/<string:pasteID>.html", methods=['GET'])
 def rawFetch(pasteID):
