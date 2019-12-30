@@ -2,7 +2,10 @@
 <html>
     <head>
       <!-- <link rel="icon" href="data:;base64,="> -->
-      <link rel="stylesheet" href="{{url_for('static', filename = 'style.css')}}">
+      <!-- <link rel="stylesheet" href="{{url_for('static', filename = 'style.css')}}"> -->
+
+      <link rel="stylesheet" href="{{url_for('static', filename = 'bootstrap.min.css')}}">
+      <link rel="stylesheet" href="{{url_for('static', filename = 'bootstrap-reboot.css')}}">
 
       {% if title %}
       <title>markdowner: {{ title }}</title>
@@ -13,7 +16,7 @@
       <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.png') }}">
     </head>
     <body>
-        <div class="content">
+        <div class="container">
           <div class="row header"><div id="left">markdowner: <a href="{{ url_for('index') }}">root</a> | <a href="{{ url_for('upload') }}">upload</a> {% if session.get("authenticated") %} | <a href="{{url_for('list_pastes') }}">list</a>{% endif %} {% if fetch %} | <a href="{{url_for('rawFetch', pasteID = paste['pasteID'])}}">raw</a> | <a href="{{url_for('sourceFetch', pasteID = paste['pasteID'])}}">source</a>{% endif %}</div><div id="right"> {% if fetch %}by: {{ paste["username"] }} | uploaded at: {{ paste["timestamp"].strftime("%d/%m/%Y %H:%M:%S") }}{% else %}{% if not session.get("authenticated") %}<a href="{{ url_for('login')}}">login</a>{% else %}<a href="{{ url_for('logout')}}">logout</a>{% endif %}{% endif %}</div> 
           <div id="below"><hr></div></div>
           {% block content %}{% endblock %}
