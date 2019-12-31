@@ -1,26 +1,108 @@
 <!DOCTYPE html>
 <html>
-    <head>
-      <!-- <link rel="icon" href="data:;base64,="> -->
-      <!-- <link rel="stylesheet" href="{{url_for('static', filename = 'style.css')}}"> -->
+  <head>
+    <!-- <link rel="icon" href="data:;base64,="> -->
 
-      <link rel="stylesheet" href="{{url_for('static', filename = 'bootstrap.min.css')}}">
-      <link rel="stylesheet" href="{{url_for('static', filename = 'bootstrap-reboot.css')}}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-      {% if title %}
+    <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script> -->
+
+    <script src="{{url_for('static', filename = 'jquery-3.4.1.slim.min.js')}}"></script>
+    <script src="{{url_for('static', filename = 'popper.min.js')}}"></script>
+
+    <link rel="stylesheet" href="{{url_for('static', filename = 'bootstrap.min.css')}}">
+    <!-- <link rel="stylesheet" href="{{url_for('static', filename = 'bootstrap-reboot.min.css')}}"> -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"> -->
+    <script src="{{url_for('static', filename = 'bootstrap-reboot.min.css')}}"></script>
+
+    <link rel="stylesheet" href="{{url_for('static', filename = 'custom.css')}}">
+
+    {% if title %}
       <title>markdowner: {{ title }}</title>
-      {% else %}
+    {% else %}
       <title>markdowner</title>
-      {% endif %}
+    {% endif %}
 
-      <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.png') }}">
-    </head>
-    <body>
-        <div class="container">
-          <div class="row header"><div id="left">markdowner: <a href="{{ url_for('index') }}">root</a> | <a href="{{ url_for('upload') }}">upload</a> {% if session.get("authenticated") %} | <a href="{{url_for('list_pastes') }}">list</a>{% endif %} {% if fetch %} | <a href="{{url_for('rawFetch', pasteID = paste['pasteID'])}}">raw</a> | <a href="{{url_for('sourceFetch', pasteID = paste['pasteID'])}}">source</a>{% endif %}</div><div id="right"> {% if fetch %}by: {{ paste["username"] }} | uploaded at: {{ paste["timestamp"].strftime("%d/%m/%Y %H:%M:%S") }}{% else %}{% if not session.get("authenticated") %}<a href="{{ url_for('login')}}">login</a>{% else %}<a href="{{ url_for('logout')}}">logout</a>{% endif %}{% endif %}</div> 
-          <div id="below"><hr></div></div>
-          {% block content %}{% endblock %}
-          <div class="row footer"></div>
-        </div>
-    </body>
+    <link rel="shortcut icon" href="{{ url_for('static', filename = 'favicon.png') }}">
+  </head>
+  <body class="py-10">
+      <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+          <a class="navbar-brand" href="/">markdowner</a>
+          <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        
+          <div class="navbar-collapse collapse" id="navbarColor01" style="">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('upload') }}">upload</a>
+              </li>
+              {% if session.get("authenticated") %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('list_pastes') }}">list</a>
+              </li>
+              {% endif %}
+
+              {% if fetch %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('meta', pasteID = paste['pasteID'])}}">meta</a>
+              </li> 
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('rawFetch', pasteID = paste['pasteID'])}}">raw</a>
+              </li> 
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('sourceFetch', pasteID = paste['pasteID'])}}">source</a>
+              </li>
+              {% endif %}
+            </ul>
+
+            <!-- <form class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" type="text" placeholder="Search">
+              <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+            </form> -->
+
+            {% if not session.get("authenticated") %}
+            <button class="btn btn-secondary">
+              <a class="nav-link" href="{{ url_for('login')}}">login</a>
+            </button>
+            {% else %}
+            <button class="btn btn-secondary">
+              <a class="nav-linl" href="{{ url_for('logout')}}">logout</a>
+            </button>
+            {% endif %}
+          </div>
+        </nav>
+      </header>
+
+      <div class="top container">
+        <!-- <div class="row">
+          <div class="col-sm">markdowner: <a href="{{ url_for('index') }}">root</a> </div>
+          <div class="col-sm"><a href="{{ url_for('upload') }}">upload</a> </div>
+
+          {% if session.get("authenticated") %}
+            <div class="col-sm"><a href="{{url_for('list_pastes') }}">list</a></div>
+          {% endif %}
+
+          {% if fetch %}
+            <div class="col-sm"><a href="{{url_for('rawFetch', pasteID = paste['pasteID'])}}">raw</a></div> 
+            <div class="col-sm"><a href="{{url_for('sourceFetch', pasteID = paste['pasteID'])}}">source</a></div>
+            {% endif %}
+
+            {% if fetch %}
+              <div class="col-sm"><p>by: {{ paste["username"] }} | uploaded at: {{ paste["timestamp"].strftime("%d/%m/%Y %H:%M:%S") }}</p></div>
+            {% else %}
+              {% if not session.get("authenticated") %}
+              <div class="col-sm"><a href="{{ url_for('login')}}">login</a></div>
+              {% else %}
+              <div class="col-sm"><a href="{{ url_for('logout')}}">logout</a></div>
+              {% endif %}
+            {% endif %}
+          <hr>
+        </div> -->
+        {% block content %}{% endblock %}
+      </div>
+  </body>
 </html>

@@ -123,13 +123,21 @@ def genHTML(request):
     #if user not logged in, store under their ip with a dodgy account
     if not session.get("user"):
         session["user"] = {"username": request.remote_addr}
+    else:
+        users.update(   {"username": session.get("user")["username"]},
+                        {"$inc":    {
+                                        "pasteCount": 1
+                                    }
+                        }
+                    )
 
     paste = { 
                 "pasteID": genID(),
                 "username": session.get("user")["username"],
                 "timestamp": datetime.now(),
                 "markdown": md,
-                "html": html
+                "html": html,
+                "length": len(md)
             }
 
     pastes.insert_one(paste)
@@ -181,6 +189,14 @@ def fetch(pasteID):
     paste = retrieve(pasteID)
 
     return render_template("display.html", paste = paste, title = "fetch", fetch = True)
+
+@app.route("/<string:pasteID>/meta", methods=['GET'])
+def meta(pasteID):
+    paste = retrieve(pasteID)
+
+    user = users.find_one({"username": "root"})
+
+    return render_template("meta.html", paste = paste, title = "fetch", fetch = True, top_line = paste["markdown"].splitlines()[0], user = user)
 
 def retrieve(pasteID):
     paste = pastes.find_one({"pasteID": pasteID})

@@ -1,8 +1,10 @@
 {% extends "header.html" %}
 
 {% block content %}
-    <div class="row title"><h1>login</h1></div>
-    <div class="row data">
+    <!-- <div class="row title"> -->
+        <h1>login</h1>
+    <!-- </div> -->
+    <!-- <div class="row data"> -->
         {% if request.args["error"] %}
             <p class=error><strong>Error:</strong> {{ request.args["error"] }}
         {% endif %}
@@ -23,5 +25,5 @@
             <p>password: <input type="password" name="password"></p>
             <p><input type="submit" value=signup></p>
         </form>
-    </div>
+    <!-- </div> -->
 {% endblock %}
