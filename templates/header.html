@@ -35,7 +35,7 @@
             <span class="navbar-toggler-icon"></span>
           </button>
         
-          <div class="navbar-collapse collapse" id="navbarColor01" style="">
+          <div class="navbar-collapse collapse" id="navbarColor01">
             <ul class="navbar-nav mr-auto">
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('upload') }}">upload</a>
@@ -46,16 +46,21 @@
               </li>
               {% endif %}
 
-              {% if fetch %}
-              <li class="nav-item">
-                <a class="nav-link" href="{{url_for('meta', pasteID = paste['pasteID'])}}">meta</a>
-              </li> 
-              <li class="nav-item">
-                <a class="nav-link" href="{{url_for('rawFetch', pasteID = paste['pasteID'])}}">raw</a>
-              </li> 
-              <li class="nav-item">
-                <a class="nav-link" href="{{url_for('sourceFetch', pasteID = paste['pasteID'])}}">source</a>
-              </li>
+                {% if fetch %}
+                <li class="nav-item">
+                  {% if request.path == url_for('meta', pasteID = paste['pasteID']) %}
+                  <li class="nav-item active">
+                  {% else %}
+                  <li class="nav-item">
+                  {% endif %}
+                  <a class="nav-link" href="{{url_for('meta', pasteID = paste['pasteID'])}}">meta</a>
+                </li> 
+                <li class="nav-item">
+                  <a class="nav-link" href="{{url_for('rawFetch', pasteID = paste['pasteID'])}}">raw</a>
+                </li> 
+                <li class="nav-item">
+                  <a class="nav-link" href="{{url_for('sourceFetch', pasteID = paste['pasteID'])}}">source</a>
+                </li>
               {% endif %}
             </ul>
 
@@ -66,11 +71,11 @@
 
             {% if not session.get("authenticated") %}
             <button class="btn btn-secondary">
-              <a class="nav-link" href="{{ url_for('login')}}">login</a>
+              <a href="{{ url_for('login')}}">login</a>
             </button>
             {% else %}
             <button class="btn btn-secondary">
-              <a class="nav-linl" href="{{ url_for('logout')}}">logout</a>
+              <a href="{{ url_for('logout')}}">logout</a>
             </button>
             {% endif %}
           </div>
@@ -78,30 +83,6 @@
       </header>
 
       <div class="top container">
-        <!-- <div class="row">
-          <div class="col-sm">markdowner: <a href="{{ url_for('index') }}">root</a> </div>
-          <div class="col-sm"><a href="{{ url_for('upload') }}">upload</a> </div>
-
-          {% if session.get("authenticated") %}
-            <div class="col-sm"><a href="{{url_for('list_pastes') }}">list</a></div>
-          {% endif %}
-
-          {% if fetch %}
-            <div class="col-sm"><a href="{{url_for('rawFetch', pasteID = paste['pasteID'])}}">raw</a></div> 
-            <div class="col-sm"><a href="{{url_for('sourceFetch', pasteID = paste['pasteID'])}}">source</a></div>
-            {% endif %}
-
-            {% if fetch %}
-              <div class="col-sm"><p>by: {{ paste["username"] }} | uploaded at: {{ paste["timestamp"].strftime("%d/%m/%Y %H:%M:%S") }}</p></div>
-            {% else %}
-              {% if not session.get("authenticated") %}
-              <div class="col-sm"><a href="{{ url_for('login')}}">login</a></div>
-              {% else %}
-              <div class="col-sm"><a href="{{ url_for('logout')}}">logout</a></div>
-              {% endif %}
-            {% endif %}
-          <hr>
-        </div> -->
         {% block content %}{% endblock %}
       </div>
   </body>
