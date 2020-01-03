@@ -23,7 +23,7 @@
         {% if user["username"] == "root" %}
             <td class="c3">{{ paste["username"] }}</td>
         {% endif %}
-        <td class="c4"><a href="{{ url_for('fetch', pasteID = paste['pasteID']) }}"> {{ paste['pasteID'] }}</a></td>
+        <td class="c4"><a style="font-family: monospace" href="{{ url_for('fetch', pasteID = paste['pasteID']) }}"> {{ paste['pasteID'] }}</a></td>
         <td class="c5">{{ paste["length"] }}</td>
     </tr>
     {% endfor %}
