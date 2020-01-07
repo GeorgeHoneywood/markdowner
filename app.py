@@ -26,7 +26,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 response = {}
 
-client = MongoClient(os.environ["MONGODB_URI"])
+client = MongoClient(os.environ["MONGODB_URI"], retryWrites=False)
 db = client["heroku_n4snplp7"]
 pastes = db.pastes
 users = db.users

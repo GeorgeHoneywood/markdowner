@@ -12,6 +12,7 @@
     <script src="{{url_for('static', filename = 'jquery-3.4.1.slim.min.js')}}"></script>
     <script src="{{url_for('static', filename = 'popper.min.js')}}"></script>
 
+    <script src="{{url_for('static', filename = 'bootstrap.min.js')}}"></script>
     <link rel="stylesheet" href="{{url_for('static', filename = 'bootstrap.min.css')}}">
     <!-- <link rel="stylesheet" href="{{url_for('static', filename = 'bootstrap-reboot.min.css')}}"> -->
     <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"> -->
@@ -46,20 +47,20 @@
               </li>
               {% endif %}
 
-                {% if fetch %}
-                  {% if request.path == url_for('meta', pasteID = paste['pasteID']) %}
-                    <li class="nav-item active">
-                  {% else %}
-                    <li class="nav-item">
-                  {% endif %}
-                  <a class="nav-link" href="{{url_for('meta', pasteID = paste['pasteID'])}}">meta</a>
-                </li> 
-                <li class="nav-item">
-                  <a class="nav-link" href="{{url_for('rawFetch', pasteID = paste['pasteID'])}}">raw</a>
-                </li> 
-                <li class="nav-item">
-                  <a class="nav-link" href="{{url_for('sourceFetch', pasteID = paste['pasteID'])}}">source</a>
-                </li>
+              {% if fetch %}
+              {% if request.path == url_for('meta', pasteID = paste['pasteID']) %}
+              <li class="nav-item active">
+              {% else %}
+              <li class="nav-item">
+              {% endif %}
+                <a class="nav-link" href="{{url_for('meta', pasteID = paste['pasteID'])}}">meta</a>
+              </li> 
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('rawFetch', pasteID = paste['pasteID'])}}">raw</a>
+              </li> 
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('sourceFetch', pasteID = paste['pasteID'])}}">source</a>
+              </li>
               {% endif %}
             </ul>
 
