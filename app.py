@@ -165,13 +165,13 @@ def list_pastes():
     user = session.get("user")
 
     if user["username"] == "root":
-        user_pastes = pastes.find({})
+        user_pastes = pastes.find({}, {"markdown": 0, "html": 0})
         return render_template("list-pastes.html", user_pastes = user_pastes, user = user)
 
     else:
-        user_pastes = pastes.find({"username": user["username"]})
+        user_pastes = pastes.find({"username": user["username"]}, {"markdown": 0, "html": 0})
 
-        if pastes.count_documents({"username": user["username"]}) != 0:
+        if pastes.count_documents({"username": user["username"]}, {"pasteID": 1}) != 0:
             return render_template("list-pastes.html", user_pastes = user_pastes)
         else:
             return render_template("list-pastes.html", user_pastes = None)
