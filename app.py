@@ -171,8 +171,8 @@ def list_pastes():
     else:
         user_pastes = pastes.find({"username": user["username"]}, {"markdown": 0, "html": 0})
 
-        if pastes.count_documents({"username": user["username"]}, {"pasteID": 1}) != 0:
-            return render_template("list-pastes.html", user_pastes = user_pastes)
+        if pastes.count_documents({"username": user["username"]}) != 0:
+            return render_template("list-pastes.html", user_pastes = user_pastes, user = user)
         else:
             return render_template("list-pastes.html", user_pastes = None)
 
@@ -192,14 +192,17 @@ def fetch(pasteID):
 
 @app.route("/<string:pasteID>/meta", methods=['GET'])
 def meta(pasteID):
-    paste = retrieve(pasteID)
+    paste = retrieve(pasteID, full = False)
 
-    user = users.find_one({"username": "root"})
+    user = users.find_one({"username": paste["username"]})
 
-    return render_template("meta.html", paste = paste, title = "fetch", fetch = True, top_line = paste["markdown"].splitlines()[0], user = user)
+    return render_template("meta.html", paste = paste, title = "fetch", fetch = True, user = user)
 
-def retrieve(pasteID):
-    paste = pastes.find_one({"pasteID": pasteID})
+def retrieve(pasteID, full = True):
+    if full: 
+        paste = pastes.find_one({"pasteID": pasteID})
+    else:
+        paste = pastes.find_one({"pasteID": pasteID}, {"markdown": 0, "html": 0})
 
     if not paste:
         abort(404)

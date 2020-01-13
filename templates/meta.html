@@ -3,27 +3,23 @@
 {% block content %}
     <div class="stuff idk">
         <div class="card mb-3">
-            <h3 class="card-header">paste</h3>
-            <div class="card-body">
-              <h5 class="card-title">{{top_line}}</h5>
-            </div>
+            <h3 class="card-header">paste info</h3>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">user: {{ paste["username"] }}</li>
               <li class="list-group-item">length: {{ paste["length"] }}</li>
             </ul>
             <div class="card-footer text-muted">
-                {{ paste["timestamp"].strftime("%d/%m/%Y %H:%M:%S") }}
+                creation time: {{ paste["timestamp"].strftime("%d/%m/%Y %H:%M:%S") }}
             </div>
           </div>
 
           <div class="card mb-3">
-            <h3 class="card-header">user</h3>
-            <div class="card-body">
-              <h5 class="card-title">{{ user["username"] }}</h5>
-            </div>
-
+            <h3 class="card-header">user info</h3>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">name: {{ user["username"] }}</li>
+            </ul>
             <div class="card-footer text-muted">
-              {{ user["creation"].strftime("%d/%m/%Y %H:%M:%S") }}
+              creation time: {{ user["creation"].strftime("%d/%m/%Y %H:%M:%S") }}
             </div>
           </div>
     </div>
